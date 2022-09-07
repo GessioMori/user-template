@@ -27,4 +27,17 @@ export class UserServices implements IUserServices {
     const user = await prisma.user.findUnique({ where: { email } })
     return user
   }
+  async updateUser({
+    id,
+    userData,
+  }: {
+    id: string
+    userData: { name?: string }
+  }): Promise<IUser | undefined> {
+    const user = await prisma.user.update({
+      where: { id },
+      data: { ...userData },
+    })
+    return user
+  }
 }

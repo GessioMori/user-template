@@ -12,4 +12,11 @@ export interface IUserServices {
   }): Promise<IUser>
   getUser({ id }: { id: string }): Promise<IUser | null>
   getUserByEmail({ email }: { email: string }): Promise<IUser | null>
+  updateUser({
+    id,
+    userData,
+  }: {
+    id: string
+    userData: { name?: string }
+  }): Promise<IUser | undefined>
 }

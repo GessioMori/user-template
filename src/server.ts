@@ -10,6 +10,7 @@ import { Container } from 'typedi'
 import { LoginResolver } from './modules/user/resolvers/Login/LoginResolver'
 import { LogoutResolver } from './modules/user/resolvers/Logout/LogoutResolver'
 import { RegisterUserResolver } from './modules/user/resolvers/RegisterUser/RegisterUserResolver'
+import { UpdateUserResolver } from './modules/user/resolvers/UpdateUser/UpdateUserResolver'
 import { UserInfoResolver } from './modules/user/resolvers/UserInfo/UserInfoResolver'
 import { redis } from './redis'
 
@@ -22,6 +23,7 @@ const main = async () => {
       LoginResolver,
       UserInfoResolver,
       LogoutResolver,
+      UpdateUserResolver,
     ],
     container: Container,
   })
@@ -43,7 +45,7 @@ const main = async () => {
         httpOnly: true,
         sameSite: 'none',
         secure: true,
-        maxAge: 1000 * 60 * 10, // 10 minutes
+        maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
       },
     })
   )
