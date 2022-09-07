@@ -32,7 +32,7 @@ export class UserServices implements IUserServices {
     userData,
   }: {
     id: string
-    userData: { name?: string }
+    userData: { name?: string; confirmed?: boolean }
   }): Promise<IUser | undefined> {
     const user = await prisma.user.update({
       where: { id },

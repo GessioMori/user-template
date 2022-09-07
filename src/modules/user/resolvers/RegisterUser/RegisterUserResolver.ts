@@ -2,6 +2,11 @@ import { hash } from 'argon2'
 import crypto from 'crypto'
 import { Arg, Mutation, Query, Resolver } from 'type-graphql'
 import { Service } from 'typedi'
+import {
+  confirmationEmailExpiresIn,
+  confirmationPrefix,
+} from '../../../../constants'
+import { setRedisRegister } from '../../../../redis'
 import { EtherealMailProvider } from '../../../../utils/providers/emailProvider/EtherealMailProvider'
 import { User } from '../../models/prisma/User'
 import { UserServices } from '../../services/prisma/UserServices'
@@ -40,6 +45,13 @@ export class RegisterUserResolver {
     })
 
     const registrationToken = crypto.randomUUID()
+
+    await setRedisRegister({
+      redisPrefix: confirmationPrefix,
+      expirationInHours: confirmationEmailExpiresIn,
+      token: registrationToken,
+      userId: user.id,
+    })
 
     await this.emailService.sendMail({
       to: user.email,

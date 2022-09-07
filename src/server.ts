@@ -8,6 +8,7 @@ import express from 'express'
 import session from 'express-session'
 import { buildSchema } from 'type-graphql'
 import { Container } from 'typedi'
+import { ConfirmAccountResolver } from './modules/user/resolvers/ConfirmAccount/ConfirmAccountResolver'
 import { LoginResolver } from './modules/user/resolvers/Login/LoginResolver'
 import { LogoutResolver } from './modules/user/resolvers/Logout/LogoutResolver'
 import { RegisterUserResolver } from './modules/user/resolvers/RegisterUser/RegisterUserResolver'
@@ -27,6 +28,7 @@ const main = async () => {
       UserInfoResolver,
       LogoutResolver,
       UpdateUserResolver,
+      ConfirmAccountResolver,
     ],
     container: Container,
   })
