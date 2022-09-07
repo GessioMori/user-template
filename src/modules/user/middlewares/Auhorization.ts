@@ -24,6 +24,10 @@ export class Authorization implements MiddlewareInterface<ExpressContext> {
       throw new Error('Unauthorized')
     }
 
+    if (!user.confirmed) {
+      throw new Error('Unconfirmed account')
+    }
+
     return next()
   }
 }

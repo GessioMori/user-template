@@ -3,6 +3,7 @@ import 'reflect-metadata'
 import { PrismaClient } from '@prisma/client'
 import { ApolloServer, ExpressContext } from 'apollo-server-express'
 import connect from 'connect-redis'
+import * as dotenv from 'dotenv'
 import express from 'express'
 import session from 'express-session'
 import { buildSchema } from 'type-graphql'
@@ -13,6 +14,8 @@ import { RegisterUserResolver } from './modules/user/resolvers/RegisterUser/Regi
 import { UpdateUserResolver } from './modules/user/resolvers/UpdateUser/UpdateUserResolver'
 import { UserInfoResolver } from './modules/user/resolvers/UserInfo/UserInfoResolver'
 import { redis } from './redis'
+
+dotenv.config()
 
 export const prisma = new PrismaClient()
 
@@ -63,7 +66,10 @@ const main = async () => {
   server.applyMiddleware({
     app,
     cors: {
-      origin: ['https://studio.apollographql.com'],
+      origin:
+        process.env.NODE_ENV === 'prod'
+          ? process.env.FRONT_DOMAIN_PROD
+          : process.env.FRONT_DOMAIN_DEV,
       credentials: true,
     },
   })

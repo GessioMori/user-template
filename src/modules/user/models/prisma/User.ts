@@ -19,4 +19,6 @@ export class User implements IUser {
 
   @Field()
   updatedAt: Date
+
+  confirmed: boolean
 }

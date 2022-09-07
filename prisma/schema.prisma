@@ -14,4 +14,5 @@ model User {
   password  String
   email     String   @unique
   name      String   @db.VarChar(50)
+  confirmed Boolean  @default(false)
 }
