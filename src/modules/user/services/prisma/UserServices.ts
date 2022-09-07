@@ -1,5 +1,5 @@
 import { Service } from 'typedi'
-import { prisma } from '../../../../prismaContext'
+import { prisma } from '../../../../server'
 import { IUser } from '../../models/IUser'
 import { IUserServices } from '../IUserServices'
 

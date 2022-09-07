@@ -1,25 +1,36 @@
 import 'reflect-metadata'
 
-import { ApolloServer } from 'apollo-server-express'
+import { PrismaClient } from '@prisma/client'
+import { ApolloServer, ExpressContext } from 'apollo-server-express'
 import connect from 'connect-redis'
 import express from 'express'
 import session from 'express-session'
 import { buildSchema } from 'type-graphql'
 import { Container } from 'typedi'
 import { LoginResolver } from './modules/user/resolvers/Login/LoginResolver'
+import { LogoutResolver } from './modules/user/resolvers/Logout/LogoutResolver'
 import { RegisterUserResolver } from './modules/user/resolvers/RegisterUser/RegisterUserResolver'
 import { UserInfoResolver } from './modules/user/resolvers/UserInfo/UserInfoResolver'
 import { redis } from './redis'
 
+export const prisma = new PrismaClient()
+
 const main = async () => {
   const schema = await buildSchema({
-    resolvers: [RegisterUserResolver, LoginResolver, UserInfoResolver],
+    resolvers: [
+      RegisterUserResolver,
+      LoginResolver,
+      UserInfoResolver,
+      LogoutResolver,
+    ],
     container: Container,
   })
 
   const app = express()
 
   const RedisStore = connect(session)
+
+  app.set('trust proxy', 1)
 
   app.use(
     session({
@@ -32,14 +43,16 @@ const main = async () => {
         httpOnly: true,
         sameSite: 'none',
         secure: true,
-        maxAge: 1000 * 60 * 20, // 20 minutes
+        maxAge: 1000 * 60 * 10, // 10 minutes
       },
     })
   )
 
   const server = new ApolloServer({
     schema,
-    context: ({ req }: any) => ({ req }),
+    context: ({ req, res }: ExpressContext) => {
+      return { req, res }
+    },
     csrfPrevention: true,
   })
 
