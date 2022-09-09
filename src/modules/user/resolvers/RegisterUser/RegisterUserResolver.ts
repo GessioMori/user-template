@@ -25,13 +25,13 @@ export class RegisterUserResolver {
   async createUser(
     @Arg('data') { email, name, password }: RegisterUserInputs
   ): Promise<User> {
-    const hashedPassword = await hash(password)
-
     const userExists = await this.userServices.getUserByEmail({ email })
 
     if (userExists) {
       throw new Error('User already exists')
     }
+
+    const hashedPassword = await hash(password)
 
     const user = await this.userServices.createUser({
       email,

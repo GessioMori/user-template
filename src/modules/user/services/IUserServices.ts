@@ -17,6 +17,6 @@ export interface IUserServices {
     userData,
   }: {
     id: string
-    userData: { name?: string }
+    userData: { name?: string; password?: string }
   }): Promise<IUser | undefined>
 }

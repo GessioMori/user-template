@@ -8,6 +8,7 @@ import express from 'express'
 import session from 'express-session'
 import { buildSchema } from 'type-graphql'
 import { Container } from 'typedi'
+import { ChangePasswordResolver } from './modules/user/resolvers/ChangePassword/ChangePasswordResolver'
 import { ConfirmAccountResolver } from './modules/user/resolvers/ConfirmAccount/ConfirmAccountResolver'
 import { LoginResolver } from './modules/user/resolvers/Login/LoginResolver'
 import { LogoutResolver } from './modules/user/resolvers/Logout/LogoutResolver'
@@ -31,6 +32,7 @@ const main = async () => {
       UpdateUserResolver,
       ConfirmAccountResolver,
       RequestPasswordChangeResolver,
+      ChangePasswordResolver,
     ],
     container: Container,
   })
