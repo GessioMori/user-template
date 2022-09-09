@@ -1,6 +1,6 @@
 import { hash } from 'argon2'
 import crypto from 'crypto'
-import { Arg, Mutation, Query, Resolver } from 'type-graphql'
+import { Arg, Mutation, Resolver } from 'type-graphql'
 import { Service } from 'typedi'
 import {
   confirmationEmailExpiresIn,
@@ -20,11 +20,6 @@ export class RegisterUserResolver {
     private readonly userServices: UserServices,
     private readonly emailService: EtherealMailProvider
   ) {}
-
-  @Query(() => String)
-  async hello2() {
-    return 'Hello2!'
-  }
 
   @Mutation(() => User)
   async createUser(
