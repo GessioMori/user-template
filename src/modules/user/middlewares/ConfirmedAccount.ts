@@ -8,7 +8,7 @@ import { Service } from 'typedi'
 import { UserServices } from '../services/prisma/UserServices'
 
 @Service()
-export class Authorization implements MiddlewareInterface<ExpressContext> {
+export class ConfirmedAccount implements MiddlewareInterface<ExpressContext> {
   constructor(private readonly userServices: UserServices) {}
 
   async use({ context }: ResolverData<ExpressContext>, next: NextFn) {
@@ -22,6 +22,10 @@ export class Authorization implements MiddlewareInterface<ExpressContext> {
 
     if (!user) {
       throw new Error('Unauthorized')
+    }
+
+    if (!user.confirmed) {
+      throw new Error('Unconfirmed account')
     }
 
     return next()

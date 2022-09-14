@@ -17,6 +17,7 @@ import { RequestPasswordChangeResolver } from './modules/user/resolvers/RequestP
 import { UpdateUserResolver } from './modules/user/resolvers/UpdateUser/UpdateUserResolver'
 import { UserInfoResolver } from './modules/user/resolvers/UserInfo/UserInfoResolver'
 import { redis } from './redis'
+import { ResendConfirmationEmailResolver } from './modules/user/resolvers/ResendConfirmationEmail/ResendConfirmationEmailResolver'
 
 dotenv.config()
 
@@ -33,6 +34,7 @@ const main = async () => {
       ConfirmAccountResolver,
       RequestPasswordChangeResolver,
       ChangePasswordResolver,
+      ResendConfirmationEmailResolver,
     ],
     container: Container,
   })

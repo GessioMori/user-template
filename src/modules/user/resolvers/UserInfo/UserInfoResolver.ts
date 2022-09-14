@@ -1,7 +1,7 @@
 import { ExpressContext } from 'apollo-server-express'
 import { Ctx, Query, Resolver, UseMiddleware } from 'type-graphql'
 import { Service } from 'typedi'
-import { Authorization } from '../../middlewares/Auhorization'
+import { ConfirmedAccount } from '../../middlewares/ConfirmedAccount'
 import { User } from '../../models/prisma/User'
 import { UserServices } from '../../services/prisma/UserServices'
 
@@ -10,7 +10,7 @@ import { UserServices } from '../../services/prisma/UserServices'
 export class UserInfoResolver {
   constructor(private readonly userServices: UserServices) {}
 
-  @UseMiddleware(Authorization)
+  @UseMiddleware(ConfirmedAccount)
   @Query(() => User, { nullable: true })
   async me(@Ctx() ctx: ExpressContext): Promise<User | undefined | null> {
     const user = await this.userServices.getUser({

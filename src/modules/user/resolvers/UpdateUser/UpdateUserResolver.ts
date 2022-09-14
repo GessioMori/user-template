@@ -1,7 +1,7 @@
 import { ExpressContext } from 'apollo-server-express'
 import { Arg, Ctx, Mutation, Resolver, UseMiddleware } from 'type-graphql'
 import { Service } from 'typedi'
-import { Authorization } from '../../middlewares/Auhorization'
+import { ConfirmedAccount } from '../../middlewares/ConfirmedAccount'
 import { User } from '../../models/prisma/User'
 import { UserServices } from '../../services/prisma/UserServices'
 import { UpdateUserInputs } from './UpdateUserInputs'
@@ -11,7 +11,7 @@ import { UpdateUserInputs } from './UpdateUserInputs'
 export class UpdateUserResolver {
   constructor(private readonly userServices: UserServices) {}
 
-  @UseMiddleware(Authorization)
+  @UseMiddleware(ConfirmedAccount)
   @Mutation(() => User)
   async updateUser(
     @Arg('data') data: UpdateUserInputs,

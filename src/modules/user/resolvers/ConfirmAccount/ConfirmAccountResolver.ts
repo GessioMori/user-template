@@ -18,6 +18,12 @@ export class ConfirmAccountResolver {
       throw new Error('Token expired or invalid')
     }
 
+    const isAlreadyConfirmed = await this.userServices.getUser({ id: userId })
+
+    if (isAlreadyConfirmed?.confirmed) {
+      throw new Error('Account alredy confirmed')
+    }
+
     const user = await this.userServices.updateUser({
       id: userId,
       userData: { confirmed: true },
