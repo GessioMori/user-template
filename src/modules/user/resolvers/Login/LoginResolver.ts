@@ -2,8 +2,8 @@ import { ExpressContext } from 'apollo-server-express'
 import { verify } from 'argon2'
 import { Arg, Ctx, Mutation, Resolver } from 'type-graphql'
 import { Service } from 'typedi'
-import { User } from '../../models/prisma/User'
-import { UserServices } from '../../services/prisma/UserServices'
+import { UserServices, User } from '../../../../implementations'
+
 import { LoginInputs } from './LoginInputs'
 
 @Service()

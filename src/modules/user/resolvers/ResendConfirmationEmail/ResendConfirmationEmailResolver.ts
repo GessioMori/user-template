@@ -6,10 +6,12 @@ import {
   confirmationEmailExpiresIn,
   confirmationPrefix,
 } from '../../../../constants'
-import { setRedisRegister } from '../../../../redis'
-import { EtherealMailProvider } from '../../../../utils/providers/emailProvider/EtherealMailProvider'
+import {
+  MailService,
+  SessionService,
+  UserServices,
+} from '../../../../implementations'
 import { Authorization } from '../../middlewares/Auhorization'
-import { UserServices } from '../../services/prisma/UserServices'
 import { confirmAccountEmailModel } from '../../utils/emailSender/confirmAccountEmail'
 
 @Service()
@@ -17,7 +19,8 @@ import { confirmAccountEmailModel } from '../../utils/emailSender/confirmAccount
 export class ResendConfirmationEmailResolver {
   constructor(
     private readonly userServices: UserServices,
-    private readonly emailService: EtherealMailProvider
+    private readonly emailService: MailService,
+    private readonly sessionService: SessionService
   ) {}
 
   @UseMiddleware(Authorization)
@@ -38,11 +41,13 @@ export class ResendConfirmationEmailResolver {
     const registrationToken = crypto.randomUUID()
 
     try {
-      await setRedisRegister({
-        redisPrefix: confirmationPrefix,
-        expirationInHours: confirmationEmailExpiresIn,
+      await this.sessionService.set({
         token: registrationToken,
-        userId: user.id,
+        value: user.id,
+        options: {
+          expirationTime: confirmationEmailExpiresIn,
+          prefix: confirmationPrefix,
+        },
       })
 
       await this.emailService.sendMail({

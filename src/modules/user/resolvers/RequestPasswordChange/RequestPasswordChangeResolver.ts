@@ -5,9 +5,11 @@ import {
   changePasswordEmailExpiresIn,
   changePasswordPrefix,
 } from '../../../../constants'
-import { setRedisRegister } from '../../../../redis'
-import { EtherealMailProvider } from '../../../../utils/providers/emailProvider/EtherealMailProvider'
-import { UserServices } from '../../services/prisma/UserServices'
+import {
+  MailService,
+  SessionService,
+  UserServices,
+} from '../../../../implementations'
 import { recoverPasswordEmail } from '../../utils/emailSender/recoverPasswordEmail'
 
 @Service()
@@ -15,7 +17,8 @@ import { recoverPasswordEmail } from '../../utils/emailSender/recoverPasswordEma
 export class RequestPasswordChangeResolver {
   constructor(
     private readonly userServices: UserServices,
-    private readonly emailService: EtherealMailProvider
+    private readonly emailService: MailService,
+    private readonly sessionService: SessionService
   ) {}
 
   @Mutation(() => Boolean)
@@ -29,11 +32,13 @@ export class RequestPasswordChangeResolver {
     const changePasswordToken = crypto.randomUUID()
 
     try {
-      await setRedisRegister({
-        expirationInHours: changePasswordEmailExpiresIn,
-        redisPrefix: changePasswordPrefix,
+      await this.sessionService.set({
         token: changePasswordToken,
-        userId: user.id,
+        value: user.id,
+        options: {
+          expirationTime: changePasswordEmailExpiresIn,
+          prefix: changePasswordPrefix,
+        },
       })
 
       await this.emailService.sendMail({

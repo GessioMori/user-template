@@ -2,7 +2,7 @@ import { Field, ID, ObjectType } from 'type-graphql'
 import { IUser } from '../IUser'
 
 @ObjectType()
-export class User implements IUser {
+export class PrismaUser implements IUser {
   @Field(() => ID)
   id: string
 

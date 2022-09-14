@@ -5,7 +5,7 @@ import {
   NextFn,
 } from 'type-graphql/dist/interfaces/Middleware'
 import { Service } from 'typedi'
-import { UserServices } from '../services/prisma/UserServices'
+import { UserServices } from '../../../implementations'
 
 @Service()
 export class ConfirmedAccount implements MiddlewareInterface<ExpressContext> {

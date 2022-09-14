@@ -16,8 +16,8 @@ import { RegisterUserResolver } from './modules/user/resolvers/RegisterUser/Regi
 import { RequestPasswordChangeResolver } from './modules/user/resolvers/RequestPasswordChange/RequestPasswordChangeResolver'
 import { UpdateUserResolver } from './modules/user/resolvers/UpdateUser/UpdateUserResolver'
 import { UserInfoResolver } from './modules/user/resolvers/UserInfo/UserInfoResolver'
-import { redis } from './redis'
 import { ResendConfirmationEmailResolver } from './modules/user/resolvers/ResendConfirmationEmail/ResendConfirmationEmailResolver'
+import { SessionService } from './implementations'
 
 dotenv.config()
 
@@ -47,11 +47,11 @@ const main = async () => {
 
   app.use(
     session({
-      store: new RedisStore({ client: redis }),
+      store: new RedisStore({ client: SessionService.getInstance() }),
       name: 'qid',
       saveUninitialized: false,
       resave: false,
-      secret: '1234',
+      secret: process.env.SESSION_PASSWORD || '1234',
       cookie: {
         httpOnly: true,
         sameSite: 'none',

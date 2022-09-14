@@ -1,9 +1,8 @@
 import { ExpressContext } from 'apollo-server-express'
 import { Ctx, Query, Resolver, UseMiddleware } from 'type-graphql'
 import { Service } from 'typedi'
+import { UserServices, User } from '../../../../implementations'
 import { ConfirmedAccount } from '../../middlewares/ConfirmedAccount'
-import { User } from '../../models/prisma/User'
-import { UserServices } from '../../services/prisma/UserServices'
 
 @Service()
 @Resolver()

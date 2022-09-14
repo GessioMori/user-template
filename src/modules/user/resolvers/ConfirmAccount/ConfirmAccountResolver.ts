@@ -1,18 +1,22 @@
 import { Arg, Mutation, Resolver } from 'type-graphql'
 import { Service } from 'typedi'
 import { confirmationPrefix } from '../../../../constants'
-import { redis } from '../../../../redis'
-import { User } from '../../models/prisma/User'
-import { UserServices } from '../../services/prisma/UserServices'
+import { UserServices, User, SessionService } from '../../../../implementations'
 
 @Resolver()
 @Service()
 export class ConfirmAccountResolver {
-  constructor(private readonly userServices: UserServices) {}
+  constructor(
+    private readonly userServices: UserServices,
+    private readonly sessionService: SessionService
+  ) {}
 
   @Mutation(() => User)
   async confirmAccount(@Arg('token') token: string) {
-    const userId = await redis.get(confirmationPrefix + token)
+    const userId = await this.sessionService.get({
+      token,
+      options: { prefix: confirmationPrefix },
+    })
 
     if (!userId) {
       throw new Error('Token expired or invalid')

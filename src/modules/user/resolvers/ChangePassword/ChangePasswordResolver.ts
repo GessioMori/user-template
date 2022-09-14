@@ -2,20 +2,25 @@ import { hash } from 'argon2'
 import { Arg, Mutation, Resolver } from 'type-graphql'
 import { Service } from 'typedi'
 import { changePasswordPrefix } from '../../../../constants'
-import { redis } from '../../../../redis'
-import { UserServices } from '../../services/prisma/UserServices'
+import { SessionService, UserServices } from '../../../../implementations'
 import { ChangePasswordInputs } from './ChangePasswordInputs'
 
 @Service()
 @Resolver()
 export class ChangePasswordResolver {
-  constructor(private readonly userServices: UserServices) {}
+  constructor(
+    private readonly userServices: UserServices,
+    private readonly sessionService: SessionService
+  ) {}
 
   @Mutation(() => Boolean)
   async changePassword(
     @Arg('data') { token, password }: ChangePasswordInputs
   ): Promise<boolean> {
-    const userId = await redis.get(changePasswordPrefix + token)
+    const userId = await this.sessionService.get({
+      token,
+      options: { prefix: changePasswordPrefix },
+    })
 
     if (!userId) {
       throw new Error('Password change request not found')
@@ -28,7 +33,10 @@ export class ChangePasswordResolver {
         id: userId,
         userData: { password: hashedPassword },
       })
-      await redis.del(changePasswordPrefix + token)
+      await this.sessionService.delete({
+        token,
+        options: { prefix: changePasswordPrefix },
+      })
       return true
     } catch {
       throw new Error('Some error occurred, try again')

@@ -4,7 +4,7 @@ import { IUser } from '../../models/IUser'
 import { IUserServices } from '../IUserServices'
 
 @Service()
-export class UserServices implements IUserServices {
+export class PrismaUserServices implements IUserServices {
   async createUser({
     name,
     email,

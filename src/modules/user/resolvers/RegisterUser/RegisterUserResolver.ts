@@ -6,10 +6,12 @@ import {
   confirmationEmailExpiresIn,
   confirmationPrefix,
 } from '../../../../constants'
-import { setRedisRegister } from '../../../../redis'
-import { EtherealMailProvider } from '../../../../utils/providers/emailProvider/EtherealMailProvider'
-import { User } from '../../models/prisma/User'
-import { UserServices } from '../../services/prisma/UserServices'
+import {
+  MailService,
+  SessionService,
+  User,
+  UserServices,
+} from '../../../../implementations'
 import { confirmAccountEmailModel } from '../../utils/emailSender/confirmAccountEmail'
 import { RegisterUserInputs } from './RegisterUserInputs'
 
@@ -18,7 +20,8 @@ import { RegisterUserInputs } from './RegisterUserInputs'
 export class RegisterUserResolver {
   constructor(
     private readonly userServices: UserServices,
-    private readonly emailService: EtherealMailProvider
+    private readonly emailService: MailService,
+    private readonly sessionService: SessionService
   ) {}
 
   @Mutation(() => User)
@@ -41,11 +44,13 @@ export class RegisterUserResolver {
 
     const registrationToken = crypto.randomUUID()
 
-    await setRedisRegister({
-      redisPrefix: confirmationPrefix,
-      expirationInHours: confirmationEmailExpiresIn,
+    await this.sessionService.set({
       token: registrationToken,
-      userId: user.id,
+      value: user.id,
+      options: {
+        expirationTime: confirmationEmailExpiresIn,
+        prefix: confirmationPrefix,
+      },
     })
 
     await this.emailService.sendMail({

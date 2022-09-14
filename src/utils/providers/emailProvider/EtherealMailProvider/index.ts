@@ -5,6 +5,18 @@ import { IEmailProvider } from '../IEmailProvider'
 @Service()
 export class EtherealMailProvider implements IEmailProvider {
   private client: Transporter
+  private clientConstructor = async () => {
+    const account = await nodemailer.createTestAccount()
+    this.client = nodemailer.createTransport({
+      host: account.smtp.host,
+      port: account.smtp.port,
+      secure: account.smtp.secure,
+      auth: {
+        user: account.user,
+        pass: account.pass,
+      },
+    })
+  }
 
   async sendMail({
     to,
@@ -16,16 +28,7 @@ export class EtherealMailProvider implements IEmailProvider {
     body: string
   }): Promise<void> {
     if (!this.client) {
-      const account = await nodemailer.createTestAccount()
-      this.client = nodemailer.createTransport({
-        host: account.smtp.host,
-        port: account.smtp.port,
-        secure: account.smtp.secure,
-        auth: {
-          user: account.user,
-          pass: account.pass,
-        },
-      })
+      await this.clientConstructor()
     }
 
     const message = await this.client.sendMail({
