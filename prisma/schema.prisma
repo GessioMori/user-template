@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = env("DATABASE_URL_TEST")
 }
 
 model User {
@@ -15,4 +15,6 @@ model User {
   email     String   @unique
   name      String   @db.VarChar(50)
   confirmed Boolean  @default(false)
+
+  @@map("users")
 }

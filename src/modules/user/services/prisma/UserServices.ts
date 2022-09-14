@@ -1,5 +1,5 @@
 import { Service } from 'typedi'
-import { prisma } from '../../../../server'
+import { prisma } from '../../../../prisma'
 import { IUser } from '../../models/IUser'
 import { IUserServices } from '../IUserServices'
 
@@ -8,14 +8,14 @@ export class PrismaUserServices implements IUserServices {
   async createUser({
     name,
     email,
-    password,
+    password
   }: {
     name: string
     email: string
     password: string
   }): Promise<IUser> {
     const user = await prisma.user.create({
-      data: { email, name, password },
+      data: { email, name, password }
     })
     return user
   }
@@ -29,14 +29,14 @@ export class PrismaUserServices implements IUserServices {
   }
   async updateUser({
     id,
-    userData,
+    userData
   }: {
     id: string
     userData: { name?: string; confirmed?: boolean; password?: string }
   }): Promise<IUser | undefined> {
     const user = await prisma.user.update({
       where: { id },
-      data: { ...userData },
+      data: { ...userData }
     })
     return user
   }
