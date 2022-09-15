@@ -1,10 +1,11 @@
 import { ApolloServer, ExpressContext } from 'apollo-server-express'
 import { faker } from '@faker-js/faker'
-import { createTestServer, testUrl } from '../testServer'
+import { createTestServer, testUrl } from '../../../testServer'
 import gql from 'graphql-tag'
 import fetch from 'cross-fetch'
 import ApolloClient from 'apollo-boost'
-import { prisma } from '../../prisma'
+import { prisma } from '../../../../prisma'
+import { GraphQLError } from 'graphql'
 
 const createUserData = {
   name: faker.name.fullName(),
@@ -48,5 +49,15 @@ describe('test', () => {
       email: createUserData.email
     })
     expect(data.createUser).toHaveProperty('id')
+  })
+
+  it('Should not be able to register a new user with existing email', async () => {
+    expect(async () => {
+      const response = await client.mutate({
+        mutation: createUserMutation,
+        variables: { data: createUserData }
+      })
+      return response
+    }).rejects.toThrow()
   })
 })
