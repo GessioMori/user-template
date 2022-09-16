@@ -52,12 +52,25 @@ describe('test', () => {
   })
 
   it('Should not be able to register a new user with existing email', async () => {
-    expect(async () => {
-      const response = await client.mutate({
-        mutation: createUserMutation,
-        variables: { data: createUserData }
-      })
-      return response
-    }).rejects.toThrow()
+    const response = client.mutate({
+      mutation: createUserMutation,
+      variables: { data: createUserData }
+    })
+    await expect(response).rejects.toEqual(
+      new Error('GraphQL error: User already exists')
+    )
+  })
+
+  it('Should not be able to register a new user without an email', async () => {
+    const response = client.mutate({
+      mutation: createUserMutation,
+      variables: {
+        data: {
+          name: createUserData.name,
+          password: createUserData.password
+        }
+      }
+    })
+    await expect(response).rejects.toBeInstanceOf(Error)
   })
 })

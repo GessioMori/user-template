@@ -4,13 +4,13 @@ import { Arg, Mutation, Resolver } from 'type-graphql'
 import { Service } from 'typedi'
 import {
   confirmationEmailExpiresIn,
-  confirmationPrefix,
+  confirmationPrefix
 } from '../../../../constants'
 import {
   MailService,
   SessionService,
   User,
-  UserServices,
+  UserServices
 } from '../../../../implementations'
 import { confirmAccountEmailModel } from '../../utils/emailSender/confirmAccountEmail'
 import { RegisterUserInputs } from './RegisterUserInputs'
@@ -39,7 +39,7 @@ export class RegisterUserResolver {
     const user = await this.userServices.createUser({
       email,
       name,
-      password: hashedPassword,
+      password: hashedPassword
     })
 
     const registrationToken = crypto.randomUUID()
@@ -49,14 +49,14 @@ export class RegisterUserResolver {
       value: user.id,
       options: {
         expirationTime: confirmationEmailExpiresIn,
-        prefix: confirmationPrefix,
-      },
+        prefix: confirmationPrefix
+      }
     })
 
     await this.emailService.sendMail({
       to: user.email,
       subject: 'Confirm registration',
-      body: confirmAccountEmailModel(user.name, registrationToken),
+      body: confirmAccountEmailModel(user.name, registrationToken)
     })
 
     return user

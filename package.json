@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "tsnd --respawn --transpile-only src/server.ts",
-    "test": "NODE_ENV='test' jest -i --detectOpenHandles"
+    "test": "NODE_ENV='test' jest -i --detectOpenHandles --silent"
   },
   "keywords": [],
   "author": "",
