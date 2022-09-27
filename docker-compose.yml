@@ -3,11 +3,11 @@ version: '3.8'
 services:
   db:
     image: postgres
-    container_name: 'user-interface-db'
+    container_name: user-template-db
     environment:
       - POSTGRES_USER=${PG_USER}
       - POSTGRES_PASSWORD=${PG_PASSWORD}
-      - POSTGRES_DB=user-db
+      - POSTGRES_DB=${PG_DB}
     volumes:
       - pgdata:/data/postgres
     ports:
@@ -15,6 +15,7 @@ services:
 
   redis:
     image: redis
+    container_name: user-template-redis
     ports:
       - '8002:6379'
 

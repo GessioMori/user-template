@@ -7,32 +7,15 @@ import express from 'express'
 import session from 'express-session'
 import { buildSchema } from 'type-graphql'
 import { Container } from 'typedi'
-import { ChangePasswordResolver } from './modules/user/resolvers/ChangePassword/ChangePasswordResolver'
-import { ConfirmAccountResolver } from './modules/user/resolvers/ConfirmAccount/ConfirmAccountResolver'
-import { LoginResolver } from './modules/user/resolvers/Login/LoginResolver'
-import { LogoutResolver } from './modules/user/resolvers/Logout/LogoutResolver'
-import { RegisterUserResolver } from './modules/user/resolvers/RegisterUser/RegisterUserResolver'
-import { RequestPasswordChangeResolver } from './modules/user/resolvers/RequestPasswordChange/RequestPasswordChangeResolver'
-import { UpdateUserResolver } from './modules/user/resolvers/UpdateUser/UpdateUserResolver'
-import { UserInfoResolver } from './modules/user/resolvers/UserInfo/UserInfoResolver'
-import { ResendConfirmationEmailResolver } from './modules/user/resolvers/ResendConfirmationEmail/ResendConfirmationEmailResolver'
+
 import { SessionService } from './implementations'
+import { userResolvers } from './modules/user/resolvers'
 
 dotenv.config()
 
 const main = async () => {
   const schema = await buildSchema({
-    resolvers: [
-      RegisterUserResolver,
-      LoginResolver,
-      UserInfoResolver,
-      LogoutResolver,
-      UpdateUserResolver,
-      ConfirmAccountResolver,
-      RequestPasswordChangeResolver,
-      ChangePasswordResolver,
-      ResendConfirmationEmailResolver
-    ],
+    resolvers: [...userResolvers],
     container: Container
   })
 
@@ -79,8 +62,10 @@ const main = async () => {
     }
   })
 
-  app.listen(4000, () =>
-    console.log(`Server ready at http://localhost:4000${server.graphqlPath}`)
+  const PORT = process.env.PORT || 4000
+
+  app.listen(PORT, () =>
+    console.log(`Server ready at http://localhost:${PORT}${server.graphqlPath}`)
   )
 }
 

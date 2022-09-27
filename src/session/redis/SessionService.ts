@@ -5,8 +5,6 @@ import { Service } from 'typedi'
 export class RedisSessionService implements ISessionService {
   static provider: Redis
 
-  constructor() {}
-
   static getInstance() {
     if (!RedisSessionService.provider) {
       RedisSessionService.provider = new Redis(8002)
@@ -16,7 +14,7 @@ export class RedisSessionService implements ISessionService {
 
   async get({
     token,
-    options,
+    options
   }: {
     token: string
     options?: { prefix?: string | undefined } | undefined
@@ -30,7 +28,7 @@ export class RedisSessionService implements ISessionService {
   async set({
     token,
     value,
-    options,
+    options
   }: {
     token: string
     value: string
@@ -57,7 +55,7 @@ export class RedisSessionService implements ISessionService {
 
   async delete({
     token,
-    options,
+    options
   }: {
     token: string
     options?: { prefix?: string | undefined } | undefined
