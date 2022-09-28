@@ -1,8 +1,7 @@
 import { PrismaClient } from '@prisma/client'
 
-export const prisma =
-  process.env.NODE_ENV !== 'test'
-    ? new PrismaClient()
-    : new PrismaClient({
-        datasources: { db: { url: process.env.DATABASE_URL_TEST } }
-      })
+if (process.env.NODE_ENV === 'test') {
+  process.env.DATABASE_URL = process.env.DATABASE_URL_TEST
+}
+
+export const prisma = new PrismaClient()

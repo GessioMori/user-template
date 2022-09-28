@@ -1,11 +1,8 @@
-import { ApolloServer, ExpressContext } from 'apollo-server-express'
 import { faker } from '@faker-js/faker'
-import { createTestServer, testUrl } from '../../../testServer'
-import gql from 'graphql-tag'
-import fetch from 'cross-fetch'
-import ApolloClient from 'apollo-boost'
+import { TestServer } from '../../../testServer'
 import { prisma } from '../../../../prisma'
-import { GraphQLError } from 'graphql'
+import request from 'supertest'
+import express from 'express'
 
 const createUserData = {
   name: faker.name.fullName(),
@@ -13,7 +10,7 @@ const createUserData = {
   password: faker.internet.password()
 }
 
-const createUserMutation = gql`
+const createUserMutation = `
   mutation CreateUser($data: RegisterUserInputs!) {
     createUser(data: $data) {
       id
@@ -24,26 +21,22 @@ const createUserMutation = gql`
     }
   }
 `
-describe('test', () => {
-  let server: ApolloServer<ExpressContext>
-  let client: ApolloClient<unknown>
+describe('Register user resolver', () => {
+  let app: ReturnType<typeof express>
 
   beforeAll(async () => {
-    server = await createTestServer()
-    client = new ApolloClient({ uri: testUrl, fetch: fetch })
-  })
-
-  afterAll(async () => {
-    await prisma.$queryRaw`DELETE FROM users`
-    await prisma.$disconnect()
-    await server.stop()
+    app = await TestServer.getServer()
   })
 
   it('Should be able to register a new user', async () => {
-    const { data } = await client.mutate({
-      mutation: createUserMutation,
-      variables: { data: createUserData }
-    })
+    const {
+      body: { data }
+    } = await request(app)
+      .post('/graphql')
+      .send({
+        query: createUserMutation,
+        variables: { data: createUserData }
+      })
     expect(data.createUser).toMatchObject({
       name: createUserData.name,
       email: createUserData.email
@@ -52,25 +45,30 @@ describe('test', () => {
   })
 
   it('Should not be able to register a new user with existing email', async () => {
-    const response = client.mutate({
-      mutation: createUserMutation,
-      variables: { data: createUserData }
-    })
-    await expect(response).rejects.toEqual(
-      new Error('GraphQL error: User already exists')
+    const {
+      body: { errors }
+    } = await request(app)
+      .post('/graphql')
+      .send({
+        query: createUserMutation,
+        variables: { data: createUserData }
+      })
+    expect(errors).toContainEqual(
+      expect.objectContaining({ message: 'User already exists' })
     )
   })
 
-  it('Should not be able to register a new user without an email', async () => {
-    const response = client.mutate({
-      mutation: createUserMutation,
-      variables: {
-        data: {
-          name: createUserData.name,
-          password: createUserData.password
-        }
-      }
-    })
-    await expect(response).rejects.toBeInstanceOf(Error)
+  it('Should not be able to register a new user with a valid email', async () => {
+    const {
+      body: { errors }
+    } = await request(app)
+      .post('/graphql')
+      .send({
+        query: createUserMutation,
+        variables: { data: { ...createUserData, email: 'invalidemail' } }
+      })
+    expect(errors).toContainEqual(
+      expect.objectContaining({ message: 'Argument Validation Error' })
+    )
   })
 })

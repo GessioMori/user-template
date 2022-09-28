@@ -13,20 +13,25 @@ export class EtherealMailProvider implements IEmailProvider {
       secure: account.smtp.secure,
       auth: {
         user: account.user,
-        pass: account.pass,
-      },
+        pass: account.pass
+      }
     })
   }
 
   async sendMail({
     to,
     subject,
-    body,
+    body
   }: {
     to: string
     subject: string
     body: string
   }): Promise<void> {
+    if (process.env.NODE_ENV === 'test') {
+      console.log('Email sent')
+      return
+    }
+
     if (!this.client) {
       await this.clientConstructor()
     }
@@ -36,7 +41,7 @@ export class EtherealMailProvider implements IEmailProvider {
       from: 'dev <dev@dev.com>',
       subject,
       text: body,
-      html: body,
+      html: body
     })
     console.log('Message sent: %s', message.messageId)
     console.log('Preview URL: %s', nodemailer.getTestMessageUrl(message))

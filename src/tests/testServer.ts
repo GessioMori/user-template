@@ -7,78 +7,58 @@ import express from 'express'
 import session from 'express-session'
 import { buildSchema } from 'type-graphql'
 import { Container } from 'typedi'
+
 import { SessionService } from '../implementations'
-import { ChangePasswordResolver } from '../modules/user/resolvers/ChangePassword/ChangePasswordResolver'
-import { ConfirmAccountResolver } from '../modules/user/resolvers/ConfirmAccount/ConfirmAccountResolver'
-import { LoginResolver } from '../modules/user/resolvers/Login/LoginResolver'
-import { LogoutResolver } from '../modules/user/resolvers/Logout/LogoutResolver'
-import { RegisterUserResolver } from '../modules/user/resolvers/RegisterUser/RegisterUserResolver'
-import { RequestPasswordChangeResolver } from '../modules/user/resolvers/RequestPasswordChange/RequestPasswordChangeResolver'
-import { ResendConfirmationEmailResolver } from '../modules/user/resolvers/ResendConfirmationEmail/ResendConfirmationEmailResolver'
-import { UpdateUserResolver } from '../modules/user/resolvers/UpdateUser/UpdateUserResolver'
-import { UserInfoResolver } from '../modules/user/resolvers/UserInfo/UserInfoResolver'
+import { userResolvers } from '../modules/user/resolvers'
 
 dotenv.config()
 jest.setTimeout(20000)
-export const testUrl = 'http://localhost:5000/graphql'
 
-export const createTestServer = async () => {
-  const schema = await buildSchema({
-    resolvers: [
-      RegisterUserResolver,
-      LoginResolver,
-      UserInfoResolver,
-      LogoutResolver,
-      UpdateUserResolver,
-      ConfirmAccountResolver,
-      RequestPasswordChangeResolver,
-      ChangePasswordResolver,
-      ResendConfirmationEmailResolver
-    ],
-    container: Container
-  })
+export class TestServer {
+  static server: ApolloServer<ExpressContext>
+  static app: ReturnType<typeof express>
 
-  const app = express()
+  static async getServer() {
+    if (!TestServer.app) {
+      const schema = await buildSchema({
+        resolvers: [...userResolvers],
+        container: Container
+      })
 
-  const RedisStore = connect(session)
+      TestServer.app = express()
 
-  app.set('trust proxy', 1)
+      const RedisStore = connect(session)
 
-  app.use(
-    session({
-      store: new RedisStore({ client: SessionService.getInstance() }),
-      name: 'qid',
-      saveUninitialized: false,
-      resave: false,
-      secret: process.env.SESSION_PASSWORD || '1234',
-      cookie: {
-        httpOnly: true,
-        sameSite: 'none',
-        secure: true,
-        maxAge: 1000 * 60 * 60 * 24 * 7 // 7 days
-      }
-    })
-  )
+      TestServer.app.use(
+        session({
+          store: new RedisStore({ client: SessionService.getInstance() }),
+          name: 'qid',
+          saveUninitialized: false,
+          resave: false,
+          secret: process.env.SESSION_PASSWORD || '1234',
+          proxy: true,
+          cookie: {
+            sameSite: 'none',
+            maxAge: 1000 * 60 * 60 * 24 * 7 // 7 days
+          }
+        })
+      )
 
-  const server = new ApolloServer({
-    schema,
-    context: ({ req, res }: ExpressContext) => {
-      return { req, res }
-    },
-    csrfPrevention: true
-  })
+      TestServer.server = new ApolloServer({
+        schema,
+        context: ({ req, res }: ExpressContext) => {
+          return { req, res }
+        }
+      })
 
-  await server.start()
+      await TestServer.server.start()
 
-  server.applyMiddleware({
-    app,
-    cors: {
-      origin: 'http://localhost',
-      credentials: true
+      TestServer.server.applyMiddleware({
+        app: TestServer.app
+      })
+
+      return TestServer.app
     }
-  })
-
-  app.listen(5000)
-
-  return server
+    return TestServer.app
+  }
 }

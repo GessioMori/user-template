@@ -2,7 +2,7 @@ import { ExpressContext } from 'apollo-server-express'
 import { ResolverData } from 'type-graphql'
 import {
   MiddlewareInterface,
-  NextFn,
+  NextFn
 } from 'type-graphql/dist/interfaces/Middleware'
 import { Service } from 'typedi'
 import { UserServices } from '../../../implementations'
@@ -17,7 +17,7 @@ export class Authorization implements MiddlewareInterface<ExpressContext> {
     }
 
     const user = await this.userServices.getUser({
-      id: context.req.session.userId,
+      id: context.req.session.userId
     })
 
     if (!user) {
